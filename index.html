@@ -5,107 +5,461 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>WEEETrace – Audit-ready traceability for WEEE recycling</title>
   <meta name="description" content="Audit-ready traceability for WEEE recycling operations. Mobile-first chain-of-custody records from intake to final processing.">
+
   <style>
-    body {
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    :root{
+      --bg: #ffffff;
+      --text: #111827;     /* near-black */
+      --muted: #4b5563;    /* gray */
+      --border: #e5e7eb;   /* light gray */
+      --card: #f9fafb;     /* subtle gray */
+      --accent: #1f4fd8;   /* blue */
+      --accent2: #0f2f8a;
+      --shadow: 0 10px 30px rgba(17,24,39,0.08);
+      --radius: 14px;
+      --maxw: 1040px;
+    }
+
+    * { box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+
+    body{
       margin: 0;
-      padding: 0;
-      background: #ffffff;
-      color: #222;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
+      background: var(--bg);
+      color: var(--text);
       line-height: 1.6;
     }
-    .container {
-      max-width: 900px;
-      margin: 0 auto;
-      padding: 60px 20px;
+
+    a { color: inherit; }
+    .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+
+    /* Header */
+    header{
+      position: sticky;
+      top: 0;
+      background: rgba(255,255,255,0.9);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+      z-index: 20;
     }
-    h1, h2 {
-      font-weight: 600;
-      line-height: 1.3;
+    .nav{
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      padding: 14px 0;
+      gap: 16px;
     }
-    h1 {
-      font-size: 2.2rem;
-      margin-bottom: 20px;
+    .brand{
+      display:flex;
+      align-items:center;
+      gap: 10px;
+      font-weight: 700;
+      letter-spacing: -0.02em;
     }
-    h2 {
-      font-size: 1.4rem;
-      margin-top: 60px;
+    .brand-badge{
+      width: 34px; height: 34px;
+      border-radius: 10px;
+      background: linear-gradient(135deg, var(--accent), var(--accent2));
+      box-shadow: var(--shadow);
     }
-    p {
-      max-width: 700px;
+    nav ul{
+      display:flex; gap: 18px; list-style:none; padding: 0; margin: 0;
+      color: var(--muted);
+      font-size: 0.95rem;
     }
-    .cta {
-      margin-top: 30px;
-    }
-    .cta a {
-      display: inline-block;
-      padding: 12px 22px;
-      background: #1f4fd8;
+    nav a{ text-decoration:none; }
+    nav a:hover{ color: var(--text); }
+    .nav-cta a{
+      text-decoration:none;
+      background: var(--accent);
       color: #fff;
-      text-decoration: none;
-      border-radius: 4px;
-      font-weight: 500;
+      padding: 10px 14px;
+      border-radius: 10px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 20px rgba(31,79,216,0.18);
     }
-    footer {
-      margin-top: 80px;
-      font-size: 0.9rem;
-      color: #666;
+    .nav-cta a:hover{ background: var(--accent2); }
+
+    /* Hero */
+    .hero{
+      padding: 56px 0 26px;
+    }
+    .hero-grid{
+      display:grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      gap: 28px;
+      align-items: start;
+    }
+    h1{
+      font-size: clamp(2rem, 3.5vw, 3rem);
+      line-height: 1.15;
+      margin: 0 0 14px;
+      letter-spacing: -0.03em;
+    }
+    .lead{
+      font-size: 1.08rem;
+      color: var(--muted);
+      max-width: 60ch;
+      margin: 0 0 22px;
+    }
+    .hero-actions{
+      display:flex;
+      gap: 12px;
+      align-items:center;
+      flex-wrap: wrap;
+      margin-bottom: 18px;
+    }
+    .btn{
+      display:inline-block;
+      text-decoration:none;
+      padding: 12px 16px;
+      border-radius: 12px;
+      font-weight: 650;
+      font-size: 0.98rem;
+    }
+    .btn-primary{
+      background: var(--accent);
+      color:#fff;
+      box-shadow: 0 12px 24px rgba(31,79,216,0.18);
+    }
+    .btn-primary:hover{ background: var(--accent2); }
+    .btn-secondary{
+      border: 1px solid var(--border);
+      background: #fff;
+      color: var(--text);
+    }
+    .btn-secondary:hover{ background: #f3f4f6; }
+
+    .micro{
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    /* Hero visual */
+    .visual{
+      border: 1px solid var(--border);
+      background: radial-gradient(circle at 30% 20%, rgba(31,79,216,0.12), transparent 55%),
+                  radial-gradient(circle at 70% 60%, rgba(15,47,138,0.10), transparent 55%),
+                  linear-gradient(180deg, #ffffff, #f9fafb);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+    }
+    .visual h3{
+      margin: 0 0 10px;
+      font-size: 1rem;
+      color: var(--muted);
+      font-weight: 650;
+    }
+    .pill{
+      display:inline-flex; gap: 8px; align-items:center;
+      padding: 8px 10px;
+      border: 1px solid var(--border);
+      border-radius: 999px;
+      background: rgba(255,255,255,0.8);
+      margin: 6px 6px 0 0;
+      font-size: 0.92rem;
+      color: var(--text);
+    }
+    .dot{
+      width: 8px; height: 8px; border-radius: 50%;
+      background: var(--accent);
+    }
+
+    /* Sections */
+    section{ padding: 42px 0; }
+    .section-title{
+      font-size: 1.5rem;
+      margin: 0 0 12px;
+      letter-spacing: -0.02em;
+    }
+    .section-sub{
+      margin: 0;
+      color: var(--muted);
+      max-width: 70ch;
+    }
+
+    /* Cards */
+    .cards{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 14px;
+    }
+    .card{
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+    }
+    .card h4{
+      margin: 10px 0 8px;
+      font-size: 1.05rem;
+      letter-spacing: -0.01em;
+    }
+    .card p{ margin: 0; color: var(--muted); font-size: 0.98rem; }
+    .icon{
+      width: 34px; height: 34px;
+      border-radius: 12px;
+      background: #fff;
+      border: 1px solid var(--border);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+    }
+    .icon svg{ width: 18px; height: 18px; }
+
+    /* How it works */
+    .steps{
+      margin-top: 18px;
+      display:grid;
+      grid-template-columns: 1fr;
+      gap: 12px;
+    }
+    .step{
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 16px;
+      display:flex;
+      gap: 14px;
+      background: #fff;
+    }
+    .step-num{
+      width: 32px; height: 32px;
+      border-radius: 10px;
+      background: rgba(31,79,216,0.12);
+      color: var(--accent2);
+      font-weight: 750;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      flex: 0 0 auto;
+    }
+    .step h4{ margin: 0 0 4px; font-size: 1.05rem; }
+    .step p{ margin: 0; color: var(--muted); }
+
+    /* Pilot box */
+    .pilot{
+      border: 1px solid var(--border);
+      background: linear-gradient(180deg, #ffffff, #f9fafb);
+      border-radius: var(--radius);
+      padding: 18px;
+      box-shadow: var(--shadow);
+      display:grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 16px;
+      align-items: start;
+      margin-top: 18px;
+    }
+    .pilot ul{
+      margin: 10px 0 0;
+      padding-left: 18px;
+      color: var(--muted);
+    }
+
+    /* Footer */
+    footer{
+      padding: 30px 0 46px;
+      border-top: 1px solid var(--border);
+      color: var(--muted);
+      font-size: 0.92rem;
+    }
+
+    /* Responsive */
+    @media (max-width: 860px){
+      .hero-grid{ grid-template-columns: 1fr; }
+      .cards{ grid-template-columns: 1fr; }
+      .pilot{ grid-template-columns: 1fr; }
+      nav ul{ display:none; } /* keep it clean on mobile */
     }
   </style>
 </head>
 <body>
 
-  <div class="container">
+<header>
+  <div class="wrap">
+    <div class="nav">
+      <div class="brand">
+        <div class="brand-badge" aria-hidden="true"></div>
+        <div>WEEETrace</div>
+      </div>
 
-    <h1>Audit-ready traceability for WEEE recycling operations</h1>
+      <nav aria-label="Primary">
+        <ul>
+          <li><a href="#problem">Problem</a></li>
+          <li><a href="#solution">Solution</a></li>
+          <li><a href="#how">How it works</a></li>
+          <li><a href="#pilot">Pilot</a></li>
+          <li><a href="#contact">Contact</a></li>
+        </ul>
+      </nav>
 
-    <p>
-      WEEETrace is a mobile-first platform that provides verifiable chain-of-custody
-      records for regulated WEEE streams — from intake to final processing.
-    </p>
-
-    <div class="cta">
-      <a href="mailto:hello@weeetrace.com">Discuss a pilot</a>
+      <div class="nav-cta">
+        <a href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Discuss a pilot</a>
+      </div>
     </div>
+  </div>
+</header>
 
-    <h2>The problem</h2>
-    <p>
-      WEEE recycling involves multiple hand-offs, regulated processes, and increasing
-      audit and reporting requirements. Many operators still rely on spreadsheets or
-      systems not designed to provide defensible proof of compliant handling.
-    </p>
+<main>
+  <div class="wrap">
+    <section class="hero">
+      <div class="hero-grid">
+        <div>
+          <h1>Audit-ready traceability for WEEE recycling operations</h1>
+          <p class="lead">
+            A mobile-first platform that provides verifiable chain-of-custody records for regulated WEEE streams —
+            from intake to final processing.
+          </p>
 
-    <h2>The solution</h2>
-    <p>
-      WEEETrace captures key operational events at source and converts them into
-      clear, audit-ready compliance records — without disrupting existing workflows.
-    </p>
+          <div class="hero-actions">
+            <a class="btn btn-primary" href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Discuss a pilot</a>
+            <a class="btn btn-secondary" href="#pilot">How pilots work</a>
+          </div>
 
-    <h2>How it works</h2>
-    <p>
-      Operators record intake and processing events using a simple mobile interface.
-      Each item or batch builds a time-stamped chain-of-custody record, which can be
-      exported as audit-ready documentation when required.
-    </p>
+          <p class="micro">Focused on correctness, audit defensibility, and practical deployment in real facilities.</p>
+        </div>
 
-    <h2>Who it’s for</h2>
-    <p>
-      WEEE recycling facilities and contractors handling regulated electronic waste
-      streams who need reliable, regulator-defensible traceability.
-    </p>
+        <div class="visual" aria-label="Highlights">
+          <h3>Designed for regulated operations</h3>
+          <div class="pill"><span class="dot"></span> Offline-capable mobile capture</div>
+          <div class="pill"><span class="dot"></span> Chain-of-custody by item or batch</div>
+          <div class="pill"><span class="dot"></span> Audit-ready exports</div>
+          <div class="pill"><span class="dot"></span> Minimal operational disruption</div>
+        </div>
+      </div>
+    </section>
 
-    <h2>Why this approach</h2>
-    <p>
-      Built by a technical founder with over 15 years’ experience delivering production
-      systems in regulated energy and recycling environments, with a focus on
-      correctness, audit defensibility, and practical deployment.
-    </p>
+    <section id="problem">
+      <h2 class="section-title">The problem</h2>
+      <p class="section-sub">
+        WEEE recycling involves multiple hand-offs, regulated processes, and increasing audit and reporting requirements.
+        Many operators still rely on spreadsheets or systems not designed to provide defensible proof of compliant handling.
+      </p>
+    </section>
+
+    <section id="solution">
+      <h2 class="section-title">The solution</h2>
+      <p class="section-sub">
+        WEEETrace captures key operational events at source and converts them into clear, audit-ready compliance records —
+        without disrupting existing workflows.
+      </p>
+
+      <div class="cards" role="list">
+        <div class="card" role="listitem">
+          <div class="icon" aria-hidden="true">
+            <!-- Shield -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
+            </svg>
+          </div>
+          <h4>Audit-ready evidence</h4>
+          <p>Generate defensible records for internal audits, regulators, and customers without manual collation.</p>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="icon" aria-hidden="true">
+            <!-- Phone -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 16.92V21a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72c.12.81.3 1.6.54 2.36a2 2 0 0 1-.45 2.11L9.91 10.91a16 16 0 0 0 3.18 3.18l1.72-1.27a2 2 0 0 1 2.11-.45c.76.24 1.55.42 2.36.54A2 2 0 0 1 22 16.92z"/>
+            </svg>
+          </div>
+          <h4>Mobile-first capture</h4>
+          <p>Simple on-site data capture designed for industrial conditions and variable connectivity.</p>
+        </div>
+
+        <div class="card" role="listitem">
+          <div class="icon" aria-hidden="true">
+            <!-- List -->
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M8 6h13M8 12h13M8 18h13"/>
+              <path d="M3 6h.01M3 12h.01M3 18h.01"/>
+            </svg>
+          </div>
+          <h4>Chain-of-custody history</h4>
+          <p>Time-stamped event history per item or batch to support traceability and proof-of-processing.</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="how">
+      <h2 class="section-title">How it works</h2>
+      <p class="section-sub">
+        Capture the key events that matter, store them securely, and generate the outputs auditors actually need.
+      </p>
+
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div>
+            <h4>Mobile capture on site</h4>
+            <p>Record intake, handling, and processing events using a simple mobile interface (offline-capable).</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">2</div>
+          <div>
+            <h4>Secure event history</h4>
+            <p>Each item or batch builds a time-stamped chain-of-custody record for traceability and reporting.</p>
+          </div>
+        </div>
+
+        <div class="step">
+          <div class="step-num">3</div>
+          <div>
+            <h4>Audit-ready exports</h4>
+            <p>Generate compliance documentation for regulators, customers, and internal audits without manual collation.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="pilot">
+      <h2 class="section-title">Pilot programmes</h2>
+      <p class="section-sub">
+        We’re engaging with a small number of operators to run scoped pilots focused on real operational fit and audit outputs.
+      </p>
+
+      <div class="pilot">
+        <div>
+          <h3 style="margin:0 0 6px; letter-spacing:-0.02em;">What a pilot includes</h3>
+          <ul>
+            <li>Single site and one WEEE stream (item-level or batch-level)</li>
+            <li>Mobile capture workflow tailored to your process</li>
+            <li>Audit-ready output aligned to your reporting requirements</li>
+          </ul>
+        </div>
+        <div>
+          <h3 style="margin:0 0 6px; letter-spacing:-0.02em;">What we need from you</h3>
+          <ul>
+            <li>Access to current workflow and reporting needs</li>
+            <li>A nominated operational contact</li>
+            <li>A short feedback loop during the pilot period</li>
+          </ul>
+        </div>
+      </div>
+    </section>
+
+    <section id="contact">
+      <h2 class="section-title">Contact</h2>
+      <p class="section-sub">
+        If you’d like to discuss a pilot or share your traceability and audit requirements, get in touch.
+      </p>
+
+      <div class="hero-actions" style="margin-top:16px;">
+        <a class="btn btn-primary" href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Email: hello@weeetrace.com</a>
+        <a class="btn btn-secondary" href="#problem">Back to top</a>
+      </div>
+    </section>
 
     <footer>
       © WEEETrace · WEEE traceability & compliance systems
     </footer>
-
   </div>
+</main>
 
 </body>
 </html>
