@@ -1,593 +1,1725 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>WEEETrace – Audit-ready traceability for WEEE recycling</title>
-  <meta name="description" content="Audit-ready traceability for WEEE recycling operations. Mobile-first chain-of-custody records from intake to final processing.">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WEEETrace – Audit-ready traceability for WEEE recycling</title>
+<meta name="description" content="Mobile-first WEEE traceability platform. Capture chain-of-custody records at source, generate audit-ready compliance exports. Built for real recycling facilities.">
+<meta property="og:title" content="WEEETrace – Audit-ready WEEE traceability">
+<meta property="og:description" content="Verifiable chain-of-custody records for regulated WEEE streams — from intake to final processing.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://weeetrace.com">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================
+   CSS VARIABLES & RESET
+   ============================ */
+:root {
+  --green-900: #064e3b;
+  --green-800: #065f46;
+  --green-700: #047857;
+  --green-600: #059669;
+  --green-500: #10b981;
+  --green-400: #34d399;
+  --green-300: #6ee7b7;
+  --green-200: #a7f3d0;
+  --green-100: #d1fae5;
+  --green-50:  #ecfdf5;
 
-  <style>
-    :root{
-      --bg: #ffffff;
-      --text: #111827;     /* near-black */
-      --muted: #4b5563;    /* gray */
-      --border: #e5e7eb;   /* light gray */
-      --card: #f9fafb;     /* subtle gray */
-      --accent: #1f4fd8;   /* blue */
-      --accent2: #0f2f8a;
-      --shadow: 0 10px 30px rgba(17,24,39,0.08);
-      --radius: 14px;
-      --maxw: 1040px;
-    }
+  --bg-primary: #060e0c;
+  --bg-secondary: #091a16;
+  --bg-card: #0c211b;
+  --bg-card-hover: #0f2a23;
+  --border: rgba(16, 185, 129, 0.1);
+  --border-strong: rgba(16, 185, 129, 0.2);
 
-    * { box-sizing: border-box; }
-    html { scroll-behavior: smooth; }
+  --text-primary: #d1fae5;
+  --text-secondary: #6b9985;
+  --text-dim: #3d6b5a;
+  --text-bright: #ecfdf5;
 
-    body{
-      margin: 0;
-      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, "Apple Color Emoji", "Segoe UI Emoji";
-      background: var(--bg);
-      color: var(--text);
-      line-height: 1.6;
-    }
+  --font-display: 'Sora', system-ui, sans-serif;
+  --font-body: 'DM Sans', system-ui, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
 
-    a { color: inherit; }
-    .wrap{ max-width: var(--maxw); margin: 0 auto; padding: 0 20px; }
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-spring: cubic-bezier(0.34, 1.56, 0.64, 1);
 
-    /* Header */
-    header{
-      position: sticky;
-      top: 0;
-      background: rgba(255,255,255,0.9);
-      backdrop-filter: blur(10px);
-      border-bottom: 1px solid var(--border);
-      z-index: 20;
-    }
-    .nav{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      padding: 14px 0;
-      gap: 16px;
-    }
-    .brand{
-      display:flex;
-      align-items:center;
-      gap: 10px;
-      font-weight: 700;
-      letter-spacing: -0.02em;
-    }
+  --max-width: 1200px;
+  --section-pad: clamp(80px, 12vw, 140px);
+}
 
-    nav ul{
-      display:flex; gap: 18px; list-style:none; padding: 0; margin: 0;
-      color: var(--muted);
-      font-size: 0.95rem;
-    }
-    nav a{ text-decoration:none; }
-    nav a:hover{ color: var(--text); }
-    .nav-cta a{
-      text-decoration:none;
-      background: var(--accent);
-      color: #fff;
-      padding: 10px 14px;
-      border-radius: 10px;
-      font-weight: 600;
-      font-size: 0.95rem;
-      box-shadow: 0 10px 20px rgba(31,79,216,0.18);
-    }
-    .nav-cta a:hover{ background: var(--accent2); }
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
 
-    /* Hero */
-    .hero{
-      padding: 56px 0 26px;
-    }
-    .hero-grid{
-      display:grid;
-      grid-template-columns: 1.15fr 0.85fr;
-      gap: 28px;
-      align-items: start;
-    }
-    h1{
-      font-size: clamp(2rem, 3.5vw, 3rem);
-      line-height: 1.15;
-      margin: 0 0 14px;
-      letter-spacing: -0.03em;
-    }
-    .lead{
-      font-size: 1.08rem;
-      color: var(--muted);
-      max-width: 60ch;
-      margin: 0 0 22px;
-    }
-    .hero-actions{
-      display:flex;
-      gap: 12px;
-      align-items:center;
-      flex-wrap: wrap;
-      margin-bottom: 12px;
-    }
-    .btn{
-      display:inline-block;
-      text-decoration:none;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-weight: 650;
-      font-size: 0.98rem;
-    }
-    .btn-primary{
-      background: var(--accent);
-      color:#fff;
-      box-shadow: 0 12px 24px rgba(31,79,216,0.18);
-    }
-    .btn-primary:hover{ background: var(--accent2); }
-    .btn-secondary{
-      border: 1px solid var(--border);
-      background: #fff;
-      color: var(--text);
-    }
-    .btn-secondary:hover{ background: #f3f4f6; }
+html {
+  scroll-behavior: smooth;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
 
-    .micro{
-      color: var(--muted);
-      font-size: 0.92rem;
-      margin-top: 10px;
-    }
+body {
+  background: var(--bg-primary);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 16px;
+  line-height: 1.7;
+  overflow-x: hidden;
+}
 
-    /* Trust strip under buttons */
-    .trust{
-      display:flex;
-      flex-wrap: wrap;
-      gap: 10px;
-      margin: 0;
-      padding: 0;
-      list-style: none;
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
-    .trust li{
-      display:flex;
-      align-items:center;
-      gap: 8px;
-      padding: 6px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.9);
-    }
-    .trust .check{
-      width: 18px; height: 18px;
-      border-radius: 6px;
-      background: rgba(31,79,216,0.12);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      color: var(--accent2);
-      font-weight: 800;
-      line-height: 1;
-    }
+img { max-width: 100%; display: block; }
+a { color: var(--green-400); text-decoration: none; transition: color 0.2s; }
+a:hover { color: var(--green-300); }
 
-    /* Hero right column: stack illustration + highlights */
-    .hero-right{
-      display:flex;
-      flex-direction:column;
-      gap: 14px;
-    }
-    .hero-illustration{
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      box-shadow: var(--shadow);
-      overflow: hidden;
-      background: #fff;
-    }
+/* ============================
+   UTILITY
+   ============================ */
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+.section-pad { padding-top: var(--section-pad); padding-bottom: var(--section-pad); }
 
-    /* Highlights */
-    .visual{
-      border: 1px solid var(--border);
-      background: radial-gradient(circle at 30% 20%, rgba(31,79,216,0.12), transparent 55%),
-                  radial-gradient(circle at 70% 60%, rgba(15,47,138,0.10), transparent 55%),
-                  linear-gradient(180deg, #ffffff, #f9fafb);
-      border-radius: var(--radius);
-      padding: 14px;
-      box-shadow: var(--shadow);
-    }
-    .visual h3{
-      margin: 0 0 10px;
-      font-size: 1rem;
-      color: var(--muted);
-      font-weight: 650;
-    }
-    .pill{
-      display:inline-flex; gap: 8px; align-items:center;
-      padding: 8px 10px;
-      border: 1px solid var(--border);
-      border-radius: 999px;
-      background: rgba(255,255,255,0.8);
-      margin: 6px 6px 0 0;
-      font-size: 0.92rem;
-      color: var(--text);
-    }
-    .dot{
-      width: 8px; height: 8px; border-radius: 50%;
-      background: var(--accent);
-    }
+.label {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--green-500);
+  margin-bottom: 16px;
+  display: block;
+}
 
-    /* Sections */
-    section{ padding: 42px 0; }
-    .section-title{
-      font-size: 1.5rem;
-      margin: 0 0 12px;
-      letter-spacing: -0.02em;
-    }
-    .section-sub{
-      margin: 0;
-      color: var(--muted);
-      max-width: 70ch;
-    }
+.heading-xl {
+  font-family: var(--font-display);
+  font-size: clamp(36px, 5.5vw, 64px);
+  font-weight: 700;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: var(--text-bright);
+}
 
-    /* Cards */
-    .cards{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: repeat(3, 1fr);
-      gap: 14px;
-    }
-    .card{
-      background: var(--card);
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-    }
-    .card h4{
-      margin: 10px 0 8px;
-      font-size: 1.05rem;
-      letter-spacing: -0.01em;
-    }
-    .card p{ margin: 0; color: var(--muted); font-size: 0.98rem; }
-    .icon{
-      width: 34px; height: 34px;
-      border-radius: 12px;
-      background: #fff;
-      border: 1px solid var(--border);
-      display:flex;
-      align-items:center;
-      justify-content:center;
-    }
-    .icon svg{ width: 18px; height: 18px; }
+.heading-lg {
+  font-family: var(--font-display);
+  font-size: clamp(28px, 3.5vw, 42px);
+  font-weight: 700;
+  line-height: 1.15;
+  letter-spacing: -0.01em;
+  color: var(--text-bright);
+}
 
-    /* How it works */
-    .steps{
-      margin-top: 18px;
-      display:grid;
-      grid-template-columns: 1fr;
-      gap: 12px;
-    }
-    .step{
-      border: 1px solid var(--border);
-      border-radius: var(--radius);
-      padding: 16px;
-      display:flex;
-      gap: 14px;
-      background: #fff;
-    }
-    .step-num{
-      width: 32px; height: 32px;
-      border-radius: 10px;
-      background: rgba(31,79,216,0.12);
-      color: var(--accent2);
-      font-weight: 750;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      flex: 0 0 auto;
-    }
-    .step h4{ margin: 0 0 4px; font-size: 1.05rem; }
-    .step p{ margin: 0; color: var(--muted); }
+.heading-md {
+  font-family: var(--font-display);
+  font-size: clamp(18px, 2vw, 22px);
+  font-weight: 600;
+  line-height: 1.3;
+  color: var(--text-bright);
+}
 
-    /* Pilot box */
-    .pilot{
-      border: 1px solid var(--border);
-      background: linear-gradient(180deg, #ffffff, #f9fafb);
-      border-radius: var(--radius);
-      padding: 18px;
-      box-shadow: var(--shadow);
-      display:grid;
-      grid-template-columns: 1.1fr 0.9fr;
-      gap: 16px;
-      align-items: start;
-      margin-top: 18px;
-    }
-    .pilot ul{
-      margin: 10px 0 0;
-      padding-left: 18px;
-      color: var(--muted);
-    }
+.body-lg {
+  font-size: clamp(17px, 1.8vw, 20px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
 
-    /* Footer */
-    footer{
-      padding: 30px 0 46px;
-      border-top: 1px solid var(--border);
-      color: var(--muted);
-      font-size: 0.92rem;
-    }
+.body-md {
+  font-size: 15px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
 
-    /* Responsive */
-    @media (max-width: 860px){
-      .hero-grid{ grid-template-columns: 1fr; }
-      .hero-right{ margin-top: 10px; }
-      .cards{ grid-template-columns: 1fr; }
-      .pilot{ grid-template-columns: 1fr; }
-      nav ul{ display:none; } /* keep it clean on mobile */
-    }
-  </style>
+/* ============================
+   SCROLL REVEAL
+   ============================ */
+.reveal {
+  opacity: 0;
+  transform: translateY(32px);
+  transition: opacity 0.8s var(--ease-out), transform 0.8s var(--ease-out);
+}
+
+.reveal.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.reveal-delay-1 { transition-delay: 0.1s; }
+.reveal-delay-2 { transition-delay: 0.2s; }
+.reveal-delay-3 { transition-delay: 0.3s; }
+.reveal-delay-4 { transition-delay: 0.4s; }
+
+/* ============================
+   NOISE TEXTURE
+   ============================ */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.03'/%3E%3C/svg%3E");
+  pointer-events: none;
+  z-index: 9999;
+}
+
+/* ============================
+   NAVIGATION
+   ============================ */
+.nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 100;
+  padding: 0 clamp(20px, 4vw, 48px);
+  transition: background 0.4s, backdrop-filter 0.4s, border-color 0.4s;
+  border-bottom: 1px solid transparent;
+}
+
+.nav.scrolled {
+  background: rgba(6, 14, 12, 0.85);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom-color: var(--border);
+}
+
+.nav-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 72px;
+}
+
+.nav-logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.nav-logo svg { width: 36px; height: 36px; }
+
+.nav-logo-text {
+  font-family: var(--font-display);
+  font-size: 20px;
+  font-weight: 700;
+  letter-spacing: -0.3px;
+}
+
+.nav-logo-text .w { color: var(--green-500); }
+.nav-logo-text .t { color: var(--text-primary); }
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  list-style: none;
+}
+
+.nav-links a {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  letter-spacing: 0.3px;
+  transition: color 0.2s;
+}
+
+.nav-links a:hover { color: var(--green-400); }
+
+.nav-cta {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bg-primary) !important;
+  background: var(--green-500);
+  padding: 8px 20px;
+  border-radius: 8px;
+  transition: background 0.2s, transform 0.2s;
+}
+
+.nav-cta:hover {
+  background: var(--green-400);
+  color: var(--bg-primary) !important;
+  transform: translateY(-1px);
+}
+
+.nav-mobile-toggle {
+  display: none;
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+}
+
+.nav-mobile-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-secondary);
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: all 0.3s;
+}
+
+/* ============================
+   HERO
+   ============================ */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding-top: 72px;
+}
+
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+/* Radial glow */
+.hero-bg::before {
+  content: '';
+  position: absolute;
+  top: -20%;
+  right: -10%;
+  width: 70%;
+  height: 70%;
+  background: radial-gradient(ellipse, rgba(16, 185, 129, 0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+
+/* Grid pattern */
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(16, 185, 129, 0.03) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16, 185, 129, 0.03) 1px, transparent 1px);
+  background-size: 64px 64px;
+  mask-image: radial-gradient(ellipse at 60% 40%, black 20%, transparent 70%);
+  -webkit-mask-image: radial-gradient(ellipse at 60% 40%, black 20%, transparent 70%);
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  max-width: 720px;
+}
+
+.hero-content .label { margin-bottom: 24px; }
+
+.hero-content .heading-xl {
+  margin-bottom: 24px;
+}
+
+.hero-content .heading-xl .accent { color: var(--green-400); }
+
+.hero-description {
+  font-size: clamp(17px, 1.8vw, 20px);
+  color: var(--text-secondary);
+  line-height: 1.7;
+  margin-bottom: 40px;
+  max-width: 580px;
+}
+
+.hero-ctas {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 48px;
+}
+
+.btn-primary {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--bg-primary);
+  background: var(--green-500);
+  padding: 14px 32px;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  transition: all 0.25s var(--ease-out);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-primary:hover {
+  background: var(--green-400);
+  color: var(--bg-primary);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 32px rgba(16, 185, 129, 0.25);
+}
+
+.btn-secondary {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 14px 28px;
+  border-radius: 10px;
+  border: 1px solid var(--border-strong);
+  transition: all 0.25s;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.btn-secondary:hover {
+  color: var(--green-400);
+  border-color: var(--green-500);
+  background: rgba(16, 185, 129, 0.05);
+}
+
+.hero-badges {
+  display: flex;
+  gap: 24px;
+  flex-wrap: wrap;
+}
+
+.hero-badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+
+.hero-badge .dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-500);
+  box-shadow: 0 0 8px rgba(16, 185, 129, 0.4);
+}
+
+/* Floating mockup on right side */
+.hero-visual {
+  position: absolute;
+  right: clamp(-60px, -2vw, 0px);
+  top: 50%;
+  transform: translateY(-50%);
+  width: clamp(320px, 40vw, 520px);
+  z-index: 1;
+  opacity: 0.9;
+}
+
+/* ============================
+   TRUST BAR
+   ============================ */
+.trust-bar {
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+  padding: 32px 0;
+  background: rgba(9, 26, 22, 0.5);
+}
+
+.trust-bar-inner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(24px, 5vw, 64px);
+  flex-wrap: wrap;
+}
+
+.trust-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.trust-item svg { width: 20px; height: 20px; color: var(--green-500); flex-shrink: 0; }
+
+/* ============================
+   PROBLEM SECTION
+   ============================ */
+.problem {
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.problem-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 80px);
+  align-items: center;
+}
+
+.problem-visual {
+  position: relative;
+}
+
+.problem-diagram {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 40px;
+  position: relative;
+  overflow: hidden;
+}
+
+.problem-diagram::before {
+  content: '';
+  position: absolute;
+  top: 0; right: 0;
+  width: 200px; height: 200px;
+  background: radial-gradient(circle, rgba(239, 68, 68, 0.06), transparent 70%);
+}
+
+.pain-point {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.pain-point:last-child { border-bottom: none; }
+
+.pain-icon {
+  width: 36px;
+  height: 36px;
+  border-radius: 8px;
+  background: rgba(239, 68, 68, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: #f87171;
+}
+
+.pain-icon svg { width: 18px; height: 18px; }
+
+.pain-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.pain-text strong { color: var(--text-primary); font-weight: 600; }
+
+/* ============================
+   SOLUTION SECTION
+   ============================ */
+.solution-intro {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.solution-cards {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 20px;
+}
+
+.solution-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 28px;
+  transition: border-color 0.3s, transform 0.3s, box-shadow 0.3s;
+  position: relative;
+  overflow: hidden;
+}
+
+.solution-card::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--green-500), transparent);
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.solution-card:hover {
+  border-color: var(--border-strong);
+  transform: translateY(-4px);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.3);
+}
+
+.solution-card:hover::before { opacity: 1; }
+
+.solution-icon {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  background: rgba(16, 185, 129, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 20px;
+  color: var(--green-400);
+}
+
+.solution-icon svg { width: 24px; height: 24px; }
+
+.solution-card .heading-md { margin-bottom: 12px; }
+
+/* ============================
+   FEATURES SECTION
+   ============================ */
+.features {
+  background: var(--bg-secondary);
+  position: relative;
+}
+
+.features-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 64px;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 16px;
+}
+
+.feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px solid transparent;
+  transition: all 0.3s;
+}
+
+.feature-item:hover {
+  background: var(--bg-card);
+  border-color: var(--border);
+}
+
+.feature-check {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  background: rgba(16, 185, 129, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+
+.feature-check svg { width: 14px; height: 14px; color: var(--green-400); }
+
+.feature-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.feature-desc {
+  font-size: 14px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ============================
+   HOW IT WORKS
+   ============================ */
+.how-header {
+  text-align: center;
+  max-width: 680px;
+  margin: 0 auto 72px;
+}
+
+.steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 32px;
+  position: relative;
+}
+
+/* Connecting line behind steps */
+.steps::before {
+  content: '';
+  position: absolute;
+  top: 48px;
+  left: 16.66%;
+  right: 16.66%;
+  height: 2px;
+  background: linear-gradient(90deg, var(--green-500), var(--green-400), var(--green-300));
+  opacity: 0.3;
+}
+
+.step {
+  text-align: center;
+  position: relative;
+}
+
+.step-number {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: var(--bg-card);
+  border: 2px solid var(--green-500);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 24px;
+  font-family: var(--font-mono);
+  font-size: 16px;
+  font-weight: 700;
+  color: var(--green-400);
+  position: relative;
+  z-index: 2;
+}
+
+.step-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 12px;
+}
+
+.step-desc {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.7;
+  max-width: 280px;
+  margin: 0 auto;
+}
+
+/* Mockup below steps */
+.how-mockup {
+  margin-top: 72px;
+  position: relative;
+}
+
+.mockup-frame {
+  background: var(--bg-card);
+  border: 1px solid var(--border-strong);
+  border-radius: 20px;
+  padding: 32px;
+  position: relative;
+  overflow: hidden;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.mockup-frame::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(ellipse at 50% 0%, rgba(16, 185, 129, 0.04), transparent 60%);
+  pointer-events: none;
+}
+
+.mockup-browser-bar {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 20px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; background: var(--border-strong); }
+.mockup-dot:nth-child(2) { background: rgba(16, 185, 129, 0.15); }
+.mockup-dot:nth-child(3) { background: rgba(16, 185, 129, 0.1); }
+
+.mockup-url {
+  flex: 1;
+  background: rgba(16, 185, 129, 0.05);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--text-dim);
+  margin-left: 12px;
+}
+
+.mockup-content {
+  display: grid;
+  grid-template-columns: 220px 1fr;
+  gap: 24px;
+  min-height: 340px;
+}
+
+.mockup-sidebar {
+  background: rgba(16, 185, 129, 0.03);
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid var(--border);
+}
+
+.mockup-sidebar-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 4px;
+  font-size: 13px;
+  color: var(--text-dim);
+  font-family: var(--font-display);
+  font-weight: 500;
+}
+
+.mockup-sidebar-item.active {
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--green-400);
+}
+
+.mockup-sidebar-item svg { width: 16px; height: 16px; opacity: 0.6; }
+.mockup-sidebar-item.active svg { opacity: 1; }
+
+.mockup-main {
+  padding: 4px;
+}
+
+.mockup-main-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.mockup-main-title {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.mockup-badge-sm {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  padding: 4px 10px;
+  border-radius: 6px;
+  background: rgba(16, 185, 129, 0.1);
+  color: var(--green-400);
+  letter-spacing: 0.5px;
+}
+
+.mockup-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+.mockup-table th {
+  font-family: var(--font-mono);
+  font-size: 10px;
+  font-weight: 500;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: var(--text-dim);
+  text-align: left;
+  padding: 8px 12px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mockup-table td {
+  font-size: 13px;
+  color: var(--text-secondary);
+  padding: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.mockup-table tr:last-child td { border-bottom: none; }
+
+.mockup-status {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 11px;
+  font-family: var(--font-mono);
+  padding: 3px 8px;
+  border-radius: 4px;
+}
+
+.mockup-status.processed { background: rgba(16, 185, 129, 0.1); color: var(--green-400); }
+.mockup-status.intake { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
+.mockup-status.transit { background: rgba(251, 191, 36, 0.1); color: #fbbf24; }
+
+.mockup-status::before {
+  content: '';
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: currentColor;
+}
+
+/* ============================
+   COMPLIANCE
+   ============================ */
+.compliance {
+  background: var(--bg-secondary);
+}
+
+.compliance-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(40px, 6vw, 80px);
+  align-items: start;
+}
+
+.compliance-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.compliance-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 16px;
+  padding: 20px;
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  transition: border-color 0.3s;
+}
+
+.compliance-item:hover { border-color: var(--border-strong); }
+
+.compliance-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 10px;
+  background: rgba(16, 185, 129, 0.08);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  color: var(--green-400);
+}
+
+.compliance-icon svg { width: 20px; height: 20px; }
+
+.compliance-item-title {
+  font-family: var(--font-display);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-bright);
+  margin-bottom: 4px;
+}
+
+.compliance-item-desc {
+  font-size: 13px;
+  color: var(--text-dim);
+  line-height: 1.6;
+}
+
+/* ============================
+   PILOT
+   ============================ */
+.pilot-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+}
+
+.pilot-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 36px 32px;
+}
+
+.pilot-card .heading-md {
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.pilot-card .heading-md svg { width: 22px; height: 22px; color: var(--green-400); }
+
+.pilot-list {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.pilot-list li {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.pilot-list li::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--green-500);
+  margin-top: 8px;
+  flex-shrink: 0;
+}
+
+/* ============================
+   CTA / CONTACT
+   ============================ */
+.cta-section {
+  text-align: center;
+  position: relative;
+}
+
+.cta-section::before {
+  content: '';
+  position: absolute;
+  top: 0; left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  height: 400px;
+  background: radial-gradient(ellipse, rgba(16, 185, 129, 0.08), transparent 70%);
+  pointer-events: none;
+}
+
+.cta-content {
+  position: relative;
+  z-index: 2;
+}
+
+.cta-content .heading-lg { margin-bottom: 16px; }
+.cta-content .body-lg { margin-bottom: 40px; max-width: 520px; margin-left: auto; margin-right: auto; }
+
+.cta-email {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 14px;
+  color: var(--text-dim);
+  margin-top: 20px;
+}
+
+.cta-email svg { width: 16px; height: 16px; color: var(--green-500); }
+
+/* ============================
+   FOOTER
+   ============================ */
+.footer {
+  border-top: 1px solid var(--border);
+  padding: 40px 0;
+}
+
+.footer-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 20px;
+}
+
+.footer-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.footer-left svg { width: 24px; height: 24px; }
+
+.footer-left span {
+  font-family: var(--font-display);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--text-dim);
+}
+
+.footer-right {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+}
+
+/* ============================
+   DIVIDER
+   ============================ */
+.section-divider {
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border-strong), transparent);
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+/* ============================
+   RESPONSIVE
+   ============================ */
+@media (max-width: 900px) {
+  .hero-visual { display: none; }
+  .problem-grid { grid-template-columns: 1fr; }
+  .solution-cards { grid-template-columns: 1fr; }
+  .feature-grid { grid-template-columns: 1fr; }
+  .steps { grid-template-columns: 1fr; gap: 40px; }
+  .steps::before { display: none; }
+  .compliance-grid { grid-template-columns: 1fr; }
+  .pilot-grid { grid-template-columns: 1fr; }
+  .mockup-content { grid-template-columns: 1fr; }
+  .mockup-sidebar { display: none; }
+}
+
+@media (max-width: 640px) {
+  .nav-links { display: none; }
+  .nav-mobile-toggle { display: block; }
+  .nav-links.open {
+    display: flex;
+    flex-direction: column;
+    position: absolute;
+    top: 72px;
+    left: 0;
+    right: 0;
+    background: rgba(6, 14, 12, 0.95);
+    backdrop-filter: blur(20px);
+    padding: 20px;
+    gap: 16px;
+    border-bottom: 1px solid var(--border);
+  }
+}
+</style>
 </head>
 <body>
 
-<header>
-  <div class="wrap">
-    <div class="nav">
-      <div class="brand">
-        <svg width="34" height="34" viewBox="0 0 34 34" xmlns="http://www.w3.org/2000/svg" aria-label="WEEETrace logo" style="display:block">
-          <defs>
-            <linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
-              <stop offset="0" stop-color="#1f4fd8"/>
-              <stop offset="1" stop-color="#0f2f8a"/>
-            </linearGradient>
-          </defs>
-          <rect x="1" y="1" width="32" height="32" rx="10" fill="url(#g)"/>
-          <rect x="9" y="9" width="2" height="16" fill="white" opacity="0.95"/>
-          <rect x="13" y="9" width="1" height="16" fill="white" opacity="0.95"/>
-          <rect x="16" y="9" width="3" height="16" fill="white" opacity="0.95"/>
-          <rect x="21" y="9" width="1" height="16" fill="white" opacity="0.95"/>
-          <rect x="24" y="9" width="2" height="16" fill="white" opacity="0.95"/>
-        </svg>
-        <div>WEEETrace</div>
+<!-- ====== NAVIGATION ====== -->
+<nav class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#" class="nav-logo">
+      <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M256 56 A200 200 0 0 1 429 356" stroke="#10b981" stroke-width="28" stroke-linecap="round" fill="none"/>
+        <polygon points="440,338 450,372 418,358" fill="#10b981"/>
+        <path d="M429 356 A200 200 0 0 1 83 356" stroke="#34d399" stroke-width="28" stroke-linecap="round" fill="none"/>
+        <polygon points="72,338 62,372 94,358" fill="#34d399"/>
+        <path d="M83 356 A200 200 0 0 1 256 56" stroke="#6ee7b7" stroke-width="28" stroke-linecap="round" fill="none"/>
+        <polygon points="240,60 272,60 256,32" fill="#6ee7b7"/>
+        <rect x="206" y="206" width="100" height="100" rx="16" stroke="#10b981" stroke-width="6" fill="#060e0c"/>
+        <rect x="226" y="226" width="60" height="60" rx="8" fill="#10b981" opacity="0.15"/>
+        <rect x="242" y="242" width="28" height="28" rx="4" fill="#10b981" opacity="0.3"/>
+        <line x1="230" y1="206" x2="230" y2="180" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="256" y1="206" x2="256" y2="180" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="282" y1="206" x2="282" y2="180" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="230" y1="306" x2="230" y2="332" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="256" y1="306" x2="256" y2="332" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="282" y1="306" x2="282" y2="332" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="206" y1="230" x2="180" y2="230" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="206" y1="256" x2="180" y2="256" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="206" y1="282" x2="180" y2="282" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="306" y1="230" x2="332" y2="230" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="306" y1="256" x2="332" y2="256" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+        <line x1="306" y1="282" x2="332" y2="282" stroke="#10b981" stroke-width="5" stroke-linecap="round"/>
+      </svg>
+      <span class="nav-logo-text"><span class="w">WEEE</span><span class="t">Trace</span></span>
+    </a>
+    <ul class="nav-links" id="navLinks">
+      <li><a href="#problem">Problem</a></li>
+      <li><a href="#solution">Solution</a></li>
+      <li><a href="#features">Features</a></li>
+      <li><a href="#how">How it works</a></li>
+      <li><a href="#compliance">Compliance</a></li>
+      <li><a href="#pilot">Pilot</a></li>
+      <li><a href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace" class="nav-cta">Get in touch</a></li>
+    </ul>
+    <button class="nav-mobile-toggle" id="mobileToggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ====== HERO ====== -->
+<section class="hero" id="hero">
+  <div class="hero-bg">
+    <div class="hero-grid"></div>
+  </div>
+  <div class="container">
+    <div class="hero-content">
+      <span class="label reveal">WEEE Traceability Platform</span>
+      <h1 class="heading-xl reveal reveal-delay-1">
+        From intake to processing — <span class="accent">every item accounted for</span>
+      </h1>
+      <p class="hero-description reveal reveal-delay-2">
+        WEEETrace gives recycling operators a mobile-first platform to capture chain-of-custody records at source, building verifiable compliance histories without disrupting daily operations.
+      </p>
+      <div class="hero-ctas reveal reveal-delay-3">
+        <a href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace" class="btn-primary">
+          Discuss a pilot
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5-5-5-5"/></svg>
+        </a>
+        <a href="#how" class="btn-secondary">
+          See how it works
+        </a>
       </div>
-
-      <nav aria-label="Primary">
-        <ul>
-          <li><a href="#problem">Problem</a></li>
-          <li><a href="#solution">Solution</a></li>
-          <li><a href="#how">How it works</a></li>
-          <li><a href="#pilot">Pilot</a></li>
-          <li><a href="#contact">Contact</a></li>
-        </ul>
-      </nav>
-
-      <div class="nav-cta">
-        <a href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Discuss a pilot</a>
+      <div class="hero-badges reveal reveal-delay-4">
+        <span class="hero-badge"><span class="dot"></span> Offline-capable</span>
+        <span class="hero-badge"><span class="dot"></span> Item or batch traceability</span>
+        <span class="hero-badge"><span class="dot"></span> Audit-ready exports</span>
       </div>
     </div>
   </div>
-</header>
 
-<main>
-  <div class="wrap">
-    <section class="hero">
-      <div class="hero-grid">
-        <div>
-          <h1>Audit-ready traceability for WEEE recycling operations</h1>
-          <p class="lead">
-            A mobile-first platform that provides verifiable chain-of-custody records for regulated WEEE streams —
-            from intake to final processing.
-          </p>
+  <!-- Floating visual element for large screens -->
+  <div class="hero-visual" aria-hidden="true">
+    <svg viewBox="0 0 480 600" fill="none" xmlns="http://www.w3.org/2000/svg" style="filter: drop-shadow(0 20px 60px rgba(16,185,129,0.08));">
+      <!-- Phone frame -->
+      <rect x="40" y="20" width="400" height="560" rx="40" fill="#0c211b" stroke="rgba(16,185,129,0.15)" stroke-width="1.5"/>
+      <rect x="180" y="36" width="120" height="6" rx="3" fill="rgba(16,185,129,0.1)"/>
+      <!-- Screen content -->
+      <rect x="60" y="70" width="360" height="490" rx="8" fill="#091a16"/>
+      <!-- Header bar -->
+      <rect x="60" y="70" width="360" height="52" rx="8" fill="rgba(16,185,129,0.05)"/>
+      <rect x="80" y="86" width="80" height="6" rx="3" fill="#10b981" opacity="0.4"/>
+      <rect x="80" y="98" width="120" height="4" rx="2" fill="rgba(16,185,129,0.15)"/>
+      <circle cx="390" cy="96" r="14" fill="rgba(16,185,129,0.08)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+      <!-- Scan prompt area -->
+      <rect x="80" y="142" width="320" height="130" rx="12" fill="rgba(16,185,129,0.04)" stroke="rgba(16,185,129,0.12)" stroke-width="1" stroke-dasharray="6 4"/>
+      <rect x="200" y="172" width="80" height="80" rx="4" fill="rgba(16,185,129,0.06)" stroke="rgba(16,185,129,0.2)" stroke-width="1"/>
+      <!-- QR pattern inside -->
+      <rect x="212" y="184" width="14" height="14" rx="2" fill="rgba(16,185,129,0.3)"/>
+      <rect x="254" y="184" width="14" height="14" rx="2" fill="rgba(16,185,129,0.3)"/>
+      <rect x="212" y="226" width="14" height="14" rx="2" fill="rgba(16,185,129,0.3)"/>
+      <rect x="233" y="205" width="14" height="14" rx="2" fill="rgba(16,185,129,0.15)"/>
+      <text x="240" y="286" text-anchor="middle" font-family="sans-serif" font-size="11" fill="rgba(16,185,129,0.3)" letter-spacing="2">SCAN ITEM</text>
+      <!-- Recent items list -->
+      <rect x="80" y="300" width="320" height="56" rx="10" fill="rgba(16,185,129,0.04)"/>
+      <circle cx="108" cy="328" r="16" fill="rgba(16,185,129,0.08)"/>
+      <rect x="134" y="318" width="100" height="6" rx="3" fill="rgba(16,185,129,0.2)"/>
+      <rect x="134" y="330" width="160" height="4" rx="2" fill="rgba(16,185,129,0.08)"/>
+      <rect x="350" y="320" width="36" height="16" rx="4" fill="rgba(16,185,129,0.1)"/>
+      <rect x="356" y="324" width="24" height="8" rx="2" fill="#10b981" opacity="0.3"/>
 
-          <div class="hero-actions">
-            <a class="btn btn-primary" href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Discuss a pilot</a>
-            <a class="btn btn-secondary" href="#pilot">How pilots work</a>
-          </div>
+      <rect x="80" y="366" width="320" height="56" rx="10" fill="rgba(16,185,129,0.04)"/>
+      <circle cx="108" cy="394" r="16" fill="rgba(16,185,129,0.08)"/>
+      <rect x="134" y="384" width="120" height="6" rx="3" fill="rgba(16,185,129,0.2)"/>
+      <rect x="134" y="396" width="140" height="4" rx="2" fill="rgba(16,185,129,0.08)"/>
+      <rect x="350" y="386" width="36" height="16" rx="4" fill="rgba(59,130,246,0.1)"/>
+      <rect x="356" y="390" width="24" height="8" rx="2" fill="#60a5fa" opacity="0.3"/>
 
-          <ul class="trust" aria-label="Key capabilities">
-            <li><span class="check">✓</span> Offline-capable</li>
-            <li><span class="check">✓</span> Item or batch traceability</li>
-            <li><span class="check">✓</span> Audit-ready exports</li>
-          </ul>
+      <rect x="80" y="432" width="320" height="56" rx="10" fill="rgba(16,185,129,0.04)"/>
+      <circle cx="108" cy="460" r="16" fill="rgba(16,185,129,0.08)"/>
+      <rect x="134" y="450" width="90" height="6" rx="3" fill="rgba(16,185,129,0.2)"/>
+      <rect x="134" y="462" width="150" height="4" rx="2" fill="rgba(16,185,129,0.08)"/>
+      <rect x="350" y="452" width="36" height="16" rx="4" fill="rgba(251,191,36,0.1)"/>
+      <rect x="356" y="456" width="24" height="8" rx="2" fill="#fbbf24" opacity="0.3"/>
 
-          <p class="micro">Built for real facilities: reliable capture, defensible records, and audit-ready outputs.</p>
-        </div>
-
-        <div class="hero-right">
-          <div class="hero-illustration">
-            <svg viewBox="0 0 720 520" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Mobile barcode scanning illustration" style="width:100%; height:auto; display:block;">
-              <defs>
-                <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
-                  <stop offset="0" stop-color="#1f4fd8" stop-opacity="0.10"/>
-                  <stop offset="1" stop-color="#0f2f8a" stop-opacity="0.08"/>
-                </linearGradient>
-                <linearGradient id="scan" x1="0" y1="0" x2="1" y2="0">
-                  <stop offset="0" stop-color="#1f4fd8" stop-opacity="0"/>
-                  <stop offset="0.5" stop-color="#1f4fd8" stop-opacity="0.55"/>
-                  <stop offset="1" stop-color="#1f4fd8" stop-opacity="0"/>
-                </linearGradient>
-                <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
-                  <feDropShadow dx="0" dy="16" stdDeviation="18" flood-color="#111827" flood-opacity="0.12"/>
-                </filter>
-              </defs>
-
-              <rect x="20" y="20" width="680" height="480" rx="26" fill="url(#bg)"/>
-              <circle cx="170" cy="150" r="90" fill="#1f4fd8" opacity="0.06"/>
-              <circle cx="560" cy="360" r="110" fill="#0f2f8a" opacity="0.05"/>
-
-              <g filter="url(#shadow)">
-                <rect x="250" y="70" width="220" height="380" rx="34" fill="#111827" opacity="0.92"/>
-                <rect x="262" y="92" width="196" height="330" rx="24" fill="#ffffff"/>
-              </g>
-
-              <rect x="330" y="86" width="60" height="6" rx="3" fill="#ffffff" opacity="0.7"/>
-
-              <rect x="285" y="140" width="150" height="210" rx="16" fill="#f9fafb" stroke="#e5e7eb"/>
-
-              <g stroke="#1f4fd8" stroke-width="3" fill="none" opacity="0.8">
-                <path d="M300 160 h25 M300 160 v25"/>
-                <path d="M420 160 h-25 M420 160 v25"/>
-                <path d="M300 330 h25 M300 330 v-25"/>
-                <path d="M420 330 h-25 M420 330 v-25"/>
-              </g>
-
-              <g fill="#111827" opacity="0.85">
-                <rect x="310" y="220" width="4" height="70" rx="1"/>
-                <rect x="319" y="220" width="2" height="70" rx="1"/>
-                <rect x="326" y="220" width="6" height="70" rx="1"/>
-                <rect x="336" y="220" width="2" height="70" rx="1"/>
-                <rect x="343" y="220" width="3" height="70" rx="1"/>
-                <rect x="351" y="220" width="1.5" height="70" rx="1"/>
-                <rect x="356" y="220" width="7" height="70" rx="1"/>
-                <rect x="368" y="220" width="2" height="70" rx="1"/>
-                <rect x="375" y="220" width="5" height="70" rx="1"/>
-                <rect x="385" y="220" width="2" height="70" rx="1"/>
-                <rect x="392" y="220" width="6" height="70" rx="1"/>
-                <rect x="402" y="220" width="2" height="70" rx="1"/>
-              </g>
-
-              <rect x="292" y="252" width="136" height="18" fill="url(#scan)" opacity="0.95"/>
-
-              <g fill="#6b7280" opacity="0.9">
-                <rect x="295" y="365" width="130" height="10" rx="5" fill="#e5e7eb"/>
-                <rect x="295" y="383" width="90" height="10" rx="5" fill="#e5e7eb"/>
-              </g>
-
-              <g>
-                <rect x="300" y="410" width="120" height="22" rx="11" fill="#1f4fd8" opacity="0.10"/>
-                <circle cx="314" cy="421" r="5" fill="#1f4fd8" opacity="0.75"/>
-                <rect x="326" y="416" width="78" height="10" rx="5" fill="#1f4fd8" opacity="0.35"/>
-              </g>
-            </svg>
-          </div>
-
-          <div class="visual" aria-label="Highlights">
-            <h3>Designed for regulated operations</h3>
-            <div class="pill"><span class="dot"></span> Offline-capable mobile capture</div>
-            <div class="pill"><span class="dot"></span> Chain-of-custody by item or batch</div>
-            <div class="pill"><span class="dot"></span> Audit-ready exports</div>
-            <div class="pill"><span class="dot"></span> Minimal operational disruption</div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="problem">
-      <h2 class="section-title">The problem</h2>
-      <p class="section-sub">
-        WEEE recycling involves multiple hand-offs, regulated processes, and increasing audit and reporting requirements.
-        Many operators still rely on spreadsheets or systems not designed to provide defensible proof of compliant handling.
-      </p>
-    </section>
-
-    <section id="solution">
-      <h2 class="section-title">The solution</h2>
-      <p class="section-sub">
-        WEEETrace captures key operational events at source and converts them into clear, audit-ready compliance records —
-        without disrupting existing workflows.
-      </p>
-
-      <div class="cards" role="list">
-        <div class="card" role="listitem">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>
-            </svg>
-          </div>
-          <h4>Audit-ready evidence</h4>
-          <p>Generate defensible records for internal audits, regulators, and customers without manual collation.</p>
-        </div>
-
-        <div class="card" role="listitem">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M22 16.92V21a2 2 0 0 1-2.18 2A19.8 19.8 0 0 1 3 5.18 2 2 0 0 1 5 3h4.09a2 2 0 0 1 2 1.72c.12.81.3 1.6.54 2.36a2 2 0 0 1-.45 2.11L9.91 10.91a16 16 0 0 0 3.18 3.18l1.72-1.27a2 2 0 0 1 2.11-.45c.76.24 1.55.42 2.36.54A2 2 0 0 1 22 16.92z"/>
-            </svg>
-          </div>
-          <h4>Mobile-first capture</h4>
-          <p>Simple on-site data capture designed for industrial conditions and variable connectivity.</p>
-        </div>
-
-        <div class="card" role="listitem">
-          <div class="icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-              <path d="M8 6h13M8 12h13M8 18h13"/>
-              <path d="M3 6h.01M3 12h.01M3 18h.01"/>
-            </svg>
-          </div>
-          <h4>Chain-of-custody history</h4>
-          <p>Time-stamped event history per item or batch to support traceability and proof-of-processing.</p>
-        </div>
-      </div>
-    </section>
-
-    <section id="how">
-      <h2 class="section-title">How it works</h2>
-      <p class="section-sub">
-        Capture the key events that matter, store them securely, and generate the outputs auditors actually need.
-      </p>
-
-      <div class="steps">
-        <div class="step">
-          <div class="step-num">1</div>
-          <div>
-            <h4>Mobile capture on site</h4>
-            <p>Record intake, handling, and processing events using a simple mobile interface (offline-capable).</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">2</div>
-          <div>
-            <h4>Secure event history</h4>
-            <p>Each item or batch builds a time-stamped chain-of-custody record for traceability and reporting.</p>
-          </div>
-        </div>
-
-        <div class="step">
-          <div class="step-num">3</div>
-          <div>
-            <h4>Audit-ready exports</h4>
-            <p>Generate compliance documentation for regulators, customers, and internal audits without manual collation.</p>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <section id="pilot">
-      <h2 class="section-title">Pilot programmes</h2>
-      <p class="section-sub">
-        We’re engaging with a small number of operators to run scoped pilots focused on real operational fit and audit outputs.
-      </p>
-
-      <div class="pilot">
-        <div>
-          <h3 style="margin:0 0 6px; letter-spacing:-0.02em;">What a pilot includes</h3>
-          <ul>
-            <li>Single site and one WEEE stream (item-level or batch-level)</li>
-            <li>Mobile capture workflow tailored to your process</li>
-            <li>Audit-ready output aligned to your reporting requirements</li>
-          </ul>
-        </div>
-        <div>
-          <h3 style="margin:0 0 6px; letter-spacing:-0.02em;">What we need from you</h3>
-          <ul>
-            <li>Access to current workflow and reporting needs</li>
-            <li>A nominated operational contact</li>
-            <li>A short feedback loop during the pilot period</li>
-          </ul>
-        </div>
-      </div>
-    </section>
-
-    <section id="contact">
-      <h2 class="section-title">Contact</h2>
-      <p class="section-sub">
-        If you’d like to discuss a pilot or share your traceability and audit requirements, get in touch.
-      </p>
-
-      <div class="hero-actions" style="margin-top:16px;">
-        <a class="btn btn-primary" href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace">Email: hello@weeetrace.com</a>
-        <a class="btn btn-secondary" href="#problem">Back to top</a>
-      </div>
-    </section>
-
-    <footer>
-      © WEEETrace · WEEE traceability & compliance systems
-    </footer>
+      <!-- Bottom nav -->
+      <rect x="60" y="504" width="360" height="56" rx="8" fill="rgba(16,185,129,0.03)"/>
+      <circle cx="140" cy="532" r="4" fill="rgba(16,185,129,0.2)"/>
+      <circle cx="240" cy="528" r="18" fill="rgba(16,185,129,0.1)" stroke="#10b981" stroke-width="1.5"/>
+      <rect x="234" y="522" width="12" height="12" rx="2" fill="#10b981" opacity="0.4"/>
+      <circle cx="340" cy="532" r="4" fill="rgba(16,185,129,0.2)"/>
+    </svg>
   </div>
-</main>
+</section>
+
+<!-- ====== TRUST BAR ====== -->
+<div class="trust-bar">
+  <div class="container">
+    <div class="trust-bar-inner">
+      <div class="trust-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        Audit-ready evidence
+      </div>
+      <div class="trust-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2" ry="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        Mobile-first capture
+      </div>
+      <div class="trust-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+        Works offline
+      </div>
+      <div class="trust-item">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Chain-of-custody tracking
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROBLEM ====== -->
+<section class="problem section-pad" id="problem">
+  <div class="container">
+    <div class="problem-grid">
+      <div>
+        <span class="label reveal">The challenge</span>
+        <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 20px;">
+          WEEE compliance shouldn't depend on spreadsheets
+        </h2>
+        <p class="body-lg reveal reveal-delay-2" style="margin-bottom: 24px;">
+          Recycling operations handle regulated waste across multiple hand-offs, sites, and processing stages. The reporting burden is growing — and the tools haven't kept up.
+        </p>
+        <p class="body-md reveal reveal-delay-3">
+          Most operators rely on disconnected spreadsheets, paper manifests, and manual collation to satisfy audits. It works — until it doesn't. A single gap in documentation can put compliance status at risk.
+        </p>
+      </div>
+      <div class="problem-visual reveal reveal-delay-2">
+        <div class="problem-diagram">
+          <div class="pain-point">
+            <div class="pain-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="pain-text"><strong>Manual record-keeping</strong> — Spreadsheets and paper forms that are error-prone, hard to search, and fragile under audit scrutiny.</div>
+          </div>
+          <div class="pain-point">
+            <div class="pain-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
+            </div>
+            <div class="pain-text"><strong>Gaps in chain-of-custody</strong> — Hand-offs between intake, storage, and processing aren't systematically recorded.</div>
+          </div>
+          <div class="pain-point">
+            <div class="pain-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+            </div>
+            <div class="pain-text"><strong>Audit preparation is labour-intensive</strong> — Hours spent collating records across systems to produce compliance reports.</div>
+          </div>
+          <div class="pain-point">
+            <div class="pain-icon">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            </div>
+            <div class="pain-text"><strong>Increasing regulatory pressure</strong> — WEEE Directive requirements are tightening, and auditors expect digital, verifiable evidence.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ====== SOLUTION ====== -->
+<section class="section-pad" id="solution">
+  <div class="container">
+    <div class="solution-intro">
+      <span class="label reveal">The solution</span>
+      <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 16px;">
+        Capture at source. Prove at audit.
+      </h2>
+      <p class="body-lg reveal reveal-delay-2">
+        WEEETrace records operational events where they happen — on the facility floor — and transforms them into structured, time-stamped compliance records.
+      </p>
+    </div>
+
+    <div class="solution-cards">
+      <div class="solution-card reveal">
+        <div class="solution-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg>
+        </div>
+        <h3 class="heading-md">Audit-ready evidence</h3>
+        <p class="body-md">Generate defensible compliance records on demand — structured for regulators, customers, and internal quality teams. No manual collation.</p>
+      </div>
+
+      <div class="solution-card reveal reveal-delay-1">
+        <div class="solution-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
+        </div>
+        <h3 class="heading-md">Mobile-first capture</h3>
+        <p class="body-md">Designed for industrial environments. Works in warehouses with poor connectivity. Captures data at the point of handling — not hours later at a desk.</p>
+      </div>
+
+      <div class="solution-card reveal reveal-delay-2">
+        <div class="solution-icon">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        </div>
+        <h3 class="heading-md">Chain-of-custody history</h3>
+        <p class="body-md">Every item or batch builds a verifiable timeline: intake, storage, processing, and output events — all time-stamped and linked.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FEATURES ====== -->
+<section class="features section-pad" id="features">
+  <div class="container">
+    <div class="features-header">
+      <span class="label reveal">Capabilities</span>
+      <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 16px;">
+        Built for how recycling facilities actually operate
+      </h2>
+      <p class="body-lg reveal reveal-delay-2">
+        Not a generic asset tracker. Every feature is designed around the realities of WEEE processing workflows and compliance reporting.
+      </p>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-item reveal">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Offline-first architecture</div>
+          <div class="feature-desc">Capture data with no connectivity. Records sync automatically when a connection is available.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-1">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Item and batch traceability</div>
+          <div class="feature-desc">Track individual items by barcode/QR or manage by batch — adapt to your operational model.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-2">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Photo & evidence capture</div>
+          <div class="feature-desc">Attach timestamped photos to any event record for visual evidence of condition and handling.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-3">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Structured export formats</div>
+          <div class="feature-desc">Export compliance reports aligned to WEEE Directive requirements — ready for submission or internal review.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-1">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Multi-site support</div>
+          <div class="feature-desc">Manage traceability across collection points, consolidation centres, and processing facilities.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-2">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Role-based access</div>
+          <div class="feature-desc">Operators capture. Managers review. Auditors access read-only compliance views. Everyone sees what they need.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-3">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">WEEE category classification</div>
+          <div class="feature-desc">Classify items against EU WEEE Directive categories at intake. Feeds downstream reporting automatically.</div>
+        </div>
+      </div>
+      <div class="feature-item reveal reveal-delay-4">
+        <div class="feature-check"><svg fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg></div>
+        <div>
+          <div class="feature-title">Weight & material tracking</div>
+          <div class="feature-desc">Record weights at key processing stages. Track material recovery rates for reporting and value chain visibility.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ====== HOW IT WORKS ====== -->
+<section class="section-pad" id="how">
+  <div class="container">
+    <div class="how-header">
+      <span class="label reveal">How it works</span>
+      <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 16px;">
+        Three stages. One verifiable record.
+      </h2>
+      <p class="body-lg reveal reveal-delay-2">
+        Capture events where they happen, build structured histories automatically, and generate the outputs auditors need.
+      </p>
+    </div>
+
+    <div class="steps">
+      <div class="step reveal">
+        <div class="step-number">01</div>
+        <div class="step-title">Capture on site</div>
+        <div class="step-desc">Scan items or batches at intake, record handling events and processing steps via the mobile app — even offline.</div>
+      </div>
+      <div class="step reveal reveal-delay-1">
+        <div class="step-number">02</div>
+        <div class="step-title">Build the record</div>
+        <div class="step-desc">Each event adds to a time-stamped chain-of-custody history — linking items to locations, handlers, and processing outcomes.</div>
+      </div>
+      <div class="step reveal reveal-delay-2">
+        <div class="step-number">03</div>
+        <div class="step-title">Export for audit</div>
+        <div class="step-desc">Generate structured compliance reports aligned to WEEE Directive requirements — filterable by date, category, stream, or site.</div>
+      </div>
+    </div>
+
+    <!-- Dashboard mockup -->
+    <div class="how-mockup reveal">
+      <div class="mockup-frame">
+        <div class="mockup-browser-bar">
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-dot"></div>
+          <div class="mockup-url">app.weeetrace.com/dashboard</div>
+        </div>
+        <div class="mockup-content">
+          <div class="mockup-sidebar">
+            <div class="mockup-sidebar-item active">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+              Dashboard
+            </div>
+            <div class="mockup-sidebar-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/></svg>
+              Inventory
+            </div>
+            <div class="mockup-sidebar-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+              Events
+            </div>
+            <div class="mockup-sidebar-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+              Reports
+            </div>
+            <div class="mockup-sidebar-item">
+              <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+              Settings
+            </div>
+          </div>
+          <div class="mockup-main">
+            <div class="mockup-main-header">
+              <div class="mockup-main-title">Recent Activity</div>
+              <div class="mockup-badge-sm">LIVE</div>
+            </div>
+            <table class="mockup-table">
+              <thead>
+                <tr>
+                  <th>Item / Batch</th>
+                  <th>Category</th>
+                  <th>Event</th>
+                  <th>Status</th>
+                  <th>Time</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td style="font-family: var(--font-mono); font-size: 12px; color: var(--green-400);">WE-2026-04182</td>
+                  <td>Cat. 4 — Consumer</td>
+                  <td>Shredding complete</td>
+                  <td><span class="mockup-status processed">Processed</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 11px;">14:32</td>
+                </tr>
+                <tr>
+                  <td style="font-family: var(--font-mono); font-size: 12px; color: var(--green-400);">WE-2026-04179</td>
+                  <td>Cat. 1 — Temperature</td>
+                  <td>Weighed at intake</td>
+                  <td><span class="mockup-status intake">Intake</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 11px;">14:18</td>
+                </tr>
+                <tr>
+                  <td style="font-family: var(--font-mono); font-size: 12px; color: var(--green-400);">BATCH-0892</td>
+                  <td>Cat. 5 — Lighting</td>
+                  <td>Transferred to Site B</td>
+                  <td><span class="mockup-status transit">In transit</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 11px;">13:45</td>
+                </tr>
+                <tr>
+                  <td style="font-family: var(--font-mono); font-size: 12px; color: var(--green-400);">WE-2026-04175</td>
+                  <td>Cat. 2 — Screens</td>
+                  <td>Manual disassembly</td>
+                  <td><span class="mockup-status processed">Processed</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 11px;">13:22</td>
+                </tr>
+                <tr>
+                  <td style="font-family: var(--font-mono); font-size: 12px; color: var(--green-400);">WE-2026-04171</td>
+                  <td>Cat. 6 — IT Equipment</td>
+                  <td>Photo evidence added</td>
+                  <td><span class="mockup-status intake">Intake</span></td>
+                  <td style="font-family: var(--font-mono); font-size: 11px;">12:58</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== COMPLIANCE ====== -->
+<section class="compliance section-pad" id="compliance">
+  <div class="container">
+    <div class="compliance-grid">
+      <div>
+        <span class="label reveal">Compliance alignment</span>
+        <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 20px;">
+          Designed around the regulations you report against
+        </h2>
+        <p class="body-lg reveal reveal-delay-2" style="margin-bottom: 16px;">
+          WEEETrace structures data capture and reporting around the frameworks that govern WEEE handling — so audit outputs match what regulators expect to see.
+        </p>
+        <p class="body-md reveal reveal-delay-3">
+          We don't claim to make you compliant — that depends on your operations. We give you the evidence infrastructure to demonstrate it.
+        </p>
+      </div>
+
+      <div class="compliance-list">
+        <div class="compliance-item reveal">
+          <div class="compliance-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
+          </div>
+          <div>
+            <div class="compliance-item-title">EU WEEE Directive (2012/19/EU)</div>
+            <div class="compliance-item-desc">Category classification, collection targets, and recovery/recycling rate reporting aligned to Directive requirements.</div>
+          </div>
+        </div>
+        <div class="compliance-item reveal reveal-delay-1">
+          <div class="compliance-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></svg>
+          </div>
+          <div>
+            <div class="compliance-item-title">National transpositions (Ireland, UK, EU)</div>
+            <div class="compliance-item-desc">Exports structured for EPA (IE), Environment Agency (UK), and other national competent authorities.</div>
+          </div>
+        </div>
+        <div class="compliance-item reveal reveal-delay-2">
+          <div class="compliance-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+          </div>
+          <div>
+            <div class="compliance-item-title">Duty of care documentation</div>
+            <div class="compliance-item-desc">Chain-of-custody records that support waste duty of care obligations and due diligence requirements.</div>
+          </div>
+        </div>
+        <div class="compliance-item reveal reveal-delay-3">
+          <div class="compliance-icon">
+            <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73l7 4a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16z"/><polyline points="3.27 6.96 12 12.01 20.73 6.96"/><line x1="12" y1="22.08" x2="12" y2="12"/></svg>
+          </div>
+          <div>
+            <div class="compliance-item-title">Transfrontier Shipment Regulation</div>
+            <div class="compliance-item-desc">Supporting documentation for cross-border WEEE movements under EU shipment regulations.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="section-divider"></div>
+
+<!-- ====== PILOT ====== -->
+<section class="section-pad" id="pilot">
+  <div class="container">
+    <div style="text-align:center; max-width:680px; margin:0 auto 56px;">
+      <span class="label reveal">Pilot programme</span>
+      <h2 class="heading-lg reveal reveal-delay-1" style="margin-bottom: 16px;">
+        Start with a scoped pilot on one site
+      </h2>
+      <p class="body-lg reveal reveal-delay-2">
+        We're working with a small number of operators to validate operational fit and refine audit outputs. No long contracts — just a focused engagement to prove value.
+      </p>
+    </div>
+
+    <div class="pilot-grid">
+      <div class="pilot-card reveal">
+        <h3 class="heading-md">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          What a pilot includes
+        </h3>
+        <ul class="pilot-list">
+          <li>Single site deployment with one WEEE stream</li>
+          <li>Item-level or batch-level traceability — your choice</li>
+          <li>Mobile capture workflow configured to your process</li>
+          <li>Audit-ready output format aligned to your reporting needs</li>
+          <li>Dedicated support throughout the pilot period</li>
+        </ul>
+      </div>
+
+      <div class="pilot-card reveal reveal-delay-1">
+        <h3 class="heading-md">
+          <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+          What we need from you
+        </h3>
+        <ul class="pilot-list">
+          <li>Access to your current workflow and reporting requirements</li>
+          <li>A nominated operational contact at your facility</li>
+          <li>A short feedback loop during the pilot period</li>
+          <li>Willingness to share learnings to improve the platform</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== CTA ====== -->
+<section class="cta-section section-pad" id="contact">
+  <div class="container">
+    <div class="cta-content">
+      <span class="label reveal">Get started</span>
+      <h2 class="heading-lg reveal reveal-delay-1">Let's discuss your traceability requirements</h2>
+      <p class="body-lg reveal reveal-delay-2">
+        Whether you're preparing for an audit, responding to customer requirements, or looking to replace manual processes — we'd like to hear about your operation.
+      </p>
+      <div class="reveal reveal-delay-3">
+        <a href="mailto:hello@weeetrace.com?subject=Pilot%20discussion%20-%20WEEETrace" class="btn-primary" style="font-size:17px; padding: 16px 40px;">
+          Discuss a pilot
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12l5-5-5-5"/></svg>
+        </a>
+      </div>
+      <div class="cta-email reveal reveal-delay-4">
+        <svg fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+        hello@weeetrace.com
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ====== FOOTER ====== -->
+<footer class="footer">
+  <div class="container">
+    <div class="footer-inner">
+      <div class="footer-left">
+        <svg viewBox="0 0 512 512" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M256 56 A200 200 0 0 1 429 356" stroke="#10b981" stroke-width="28" stroke-linecap="round" fill="none" opacity="0.4"/>
+          <polygon points="440,338 450,372 418,358" fill="#10b981" opacity="0.4"/>
+          <path d="M429 356 A200 200 0 0 1 83 356" stroke="#34d399" stroke-width="28" stroke-linecap="round" fill="none" opacity="0.4"/>
+          <polygon points="72,338 62,372 94,358" fill="#34d399" opacity="0.4"/>
+          <path d="M83 356 A200 200 0 0 1 256 56" stroke="#6ee7b7" stroke-width="28" stroke-linecap="round" fill="none" opacity="0.4"/>
+          <polygon points="240,60 272,60 256,32" fill="#6ee7b7" opacity="0.4"/>
+          <rect x="206" y="206" width="100" height="100" rx="16" stroke="#10b981" stroke-width="6" fill="none" opacity="0.3"/>
+        </svg>
+        <span>WEEETrace</span>
+      </div>
+      <div class="footer-right">
+        © 2026 WEEETrace · WEEE traceability & compliance systems
+      </div>
+    </div>
+  </div>
+</footer>
+
+<!-- ====== SCRIPTS ====== -->
+<script>
+// Scroll reveal
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting) {
+      entry.target.classList.add('visible');
+    }
+  });
+}, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+document.querySelectorAll('.reveal').forEach(el => observer.observe(el));
+
+// Nav scroll effect
+const nav = document.getElementById('nav');
+window.addEventListener('scroll', () => {
+  nav.classList.toggle('scrolled', window.scrollY > 40);
+});
+
+// Mobile toggle
+const toggle = document.getElementById('mobileToggle');
+const links = document.getElementById('navLinks');
+toggle.addEventListener('click', () => {
+  links.classList.toggle('open');
+});
+
+// Close mobile menu on link click
+links.querySelectorAll('a').forEach(a => {
+  a.addEventListener('click', () => links.classList.remove('open'));
+});
+</script>
 
 </body>
 </html>
